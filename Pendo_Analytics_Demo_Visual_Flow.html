@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pendo Analytics — Demo Visual Flow</title>
+<style>
+  :root {
+    --pink: #E8165B;
+    --navy: #1A1F36;
+    --lavender: #6B4FBB;
+    --teal: #2EB8AA;
+    --bg: #F4F5F8;
+    --white: #fff;
+    --border: #E2E4EC;
+    --text: #2D3148;
+    --muted: #8A8FA8;
+    --sidebar: #1A1F36;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    background: var(--navy);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    height: 56px;
+    gap: 24px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  }
+  .topnav .logo { display: flex; align-items: center; gap: 10px; }
+  .topnav .logo-icon {
+    width: 32px; height: 32px; background: var(--pink); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; color: white; font-size: 16px; letter-spacing: -1px;
+  }
+  .topnav .logo-text { color: white; font-weight: 700; font-size: 17px; }
+  .topnav .subtitle { color: rgba(255,255,255,0.5); font-size: 13px; margin-left: 4px; }
+  .persona-tabs { display: flex; gap: 4px; margin-left: auto; }
+  .persona-tab {
+    padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 13px;
+    font-weight: 600; color: rgba(255,255,255,0.65); transition: all .2s; border: none;
+    background: transparent;
+  }
+  .persona-tab.active { background: var(--pink); color: white; }
+  .persona-tab:hover:not(.active) { background: rgba(255,255,255,0.1); color: white; }
+
+  /* ── LAYOUT ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── HERO BANNER ── */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, #2D2065 100%);
+    padding: 36px 48px 28px;
+    color: white;
+  }
+  .hero-label {
+    display: inline-block; background: var(--pink); color: white;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    padding: 3px 10px; border-radius: 20px; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .hero h1 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+  .hero p { color: rgba(255,255,255,0.7); font-size: 14px; max-width: 680px; line-height: 1.6; }
+  .hero-meta { display: flex; gap: 24px; margin-top: 20px; flex-wrap: wrap; }
+  .hero-meta-item { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.6); font-size: 12px; }
+  .hero-meta-item strong { color: white; }
+
+  /* ── FLOW STRIP ── */
+  .flow-strip {
+    background: white; border-bottom: 1px solid var(--border);
+    padding: 20px 48px; display: flex; align-items: center; gap: 0; overflow-x: auto;
+  }
+  .flow-step {
+    display: flex; align-items: center; gap: 0; cursor: pointer;
+  }
+  .flow-node {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 10px; transition: all .2s; min-width: 100px;
+  }
+  .flow-node.active { background: #FEF0F5; }
+  .flow-node:hover { background: var(--bg); }
+  .flow-num {
+    width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-weight: 800; font-size: 13px; color: white;
+    background: var(--border); transition: all .2s;
+  }
+  .flow-node.active .flow-num { background: var(--pink); }
+  .flow-node.done .flow-num { background: var(--teal); }
+  .flow-label {
+    font-size: 11px; font-weight: 600; text-align: center; color: var(--muted);
+    line-height: 1.3; max-width: 80px; transition: color .2s;
+  }
+  .flow-node.active .flow-label { color: var(--pink); }
+  .flow-node.done .flow-label { color: var(--teal); }
+  .flow-arrow { color: var(--border); font-size: 18px; padding: 0 4px; flex-shrink: 0; }
+
+  /* ── MAIN CONTENT ── */
+  .main { padding: 32px 48px; display: grid; grid-template-columns: 1fr 380px; gap: 28px; align-items: start; }
+
+  /* ── SCREEN MOCKUP ── */
+  .mockup-wrap {
+    background: white; border-radius: 14px; border: 1px solid var(--border);
+    overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+  .mockup-chrome {
+    background: #EDEFF5; padding: 10px 14px; display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .mockup-dots { display: flex; gap: 5px; }
+  .mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .mockup-dot.red { background: #FF5F57; }
+  .mockup-dot.yellow { background: #FEBC2E; }
+  .mockup-dot.green { background: #28C840; }
+  .mockup-url {
+    flex: 1; background: white; border-radius: 5px; padding: 4px 12px;
+    font-size: 11px; color: var(--muted); font-family: monospace;
+  }
+  .mockup-app { display: flex; min-height: 400px; }
+  .app-sidebar {
+    width: 200px; background: var(--navy); padding: 16px 0; flex-shrink: 0;
+  }
+  .sidebar-section { padding: 6px 16px 2px; color: rgba(255,255,255,0.35); font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .sidebar-item {
+    padding: 8px 16px; color: rgba(255,255,255,0.7); font-size: 12px; display: flex;
+    align-items: center; gap: 8px; cursor: pointer;
+  }
+  .sidebar-item.active { background: rgba(232,22,91,0.2); color: white; border-left: 3px solid var(--pink); }
+  .sidebar-icon { width: 14px; text-align: center; opacity: 0.7; font-size: 13px; }
+  .app-main { flex: 1; background: var(--bg); overflow: hidden; }
+  .app-header {
+    background: white; padding: 12px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .app-title { font-size: 14px; font-weight: 700; color: var(--navy); }
+  .app-subtitle { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .app-content { padding: 16px 20px; }
+
+  /* chart components */
+  .metric-row { display: flex; gap: 10px; margin-bottom: 14px; }
+  .metric-card {
+    flex: 1; background: white; border-radius: 8px; padding: 12px 14px;
+    border: 1px solid var(--border);
+  }
+  .metric-label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .metric-value { font-size: 22px; font-weight: 800; color: var(--navy); margin: 4px 0 2px; }
+  .metric-delta { font-size: 11px; }
+  .metric-delta.up { color: var(--teal); }
+  .metric-delta.down { color: var(--pink); }
+
+  .bar-chart { background: white; border-radius: 8px; padding: 14px 16px; border: 1px solid var(--border); margin-bottom: 12px; }
+  .bar-chart-title { font-size: 11px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+  .bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
+  .bar { flex: 1; background: var(--lavender); border-radius: 3px 3px 0 0; opacity: 0.85; position: relative; transition: opacity .2s; }
+  .bar:hover { opacity: 1; }
+  .bar.pink { background: var(--pink); }
+  .bar.teal { background: var(--teal); }
+  .bar-labels { display: flex; gap: 6px; margin-top: 4px; }
+  .bar-label { flex: 1; text-align: center; font-size: 9px; color: var(--muted); }
+
+  .funnel-chart { background: white; border-radius: 8px; padding: 14px 16px; border: 1px solid var(--border); margin-bottom: 12px; }
+  .funnel-title { font-size: 11px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+  .funnel-step { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .funnel-bar-wrap { flex: 1; background: var(--bg); border-radius: 3px; height: 20px; overflow: hidden; }
+  .funnel-bar-fill { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 8px; }
+  .funnel-bar-text { font-size: 10px; font-weight: 700; color: white; }
+  .funnel-step-label { font-size: 10px; color: var(--text); width: 100px; text-align: right; flex-shrink: 0; }
+  .funnel-step-pct { font-size: 10px; font-weight: 700; width: 36px; text-align: right; flex-shrink: 0; }
+  .drop-badge { background: #FEF0F5; color: var(--pink); font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; }
+
+  .path-chart { background: white; border-radius: 8px; padding: 14px 16px; border: 1px solid var(--border); margin-bottom: 12px; }
+  .path-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+  .path-node { background: var(--lavender); color: white; border-radius: 5px; padding: 4px 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+  .path-node.start { background: var(--pink); }
+  .path-node.end { background: var(--teal); }
+  .path-pct { font-size: 10px; color: var(--muted); }
+  .path-arrow { color: var(--border); font-size: 12px; }
+
+  .cohort-grid { background: white; border-radius: 8px; padding: 14px 16px; border: 1px solid var(--border); margin-bottom: 12px; overflow: auto; }
+  .cohort-title { font-size: 11px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+  .cohort-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+  .cohort-table th { background: var(--navy); color: white; padding: 5px 8px; font-weight: 700; text-align: center; }
+  .cohort-table td { padding: 4px 8px; text-align: center; border: 1px solid var(--border); font-weight: 600; }
+  .cell-100 { background: #6B4FBB; color: white; }
+  .cell-80 { background: #8B72CC; color: white; }
+  .cell-65 { background: #A994DC; color: white; }
+  .cell-50 { background: #C8B8E8; color: var(--navy); }
+  .cell-40 { background: #E0D8F3; color: var(--navy); }
+  .cell-38 { background: #EEE8F9; color: var(--navy); }
+
+  .ai-card { background: white; border-radius: 8px; padding: 14px 16px; border: 1px solid var(--border); margin-bottom: 12px; }
+  .ai-badge { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(90deg, var(--lavender), var(--pink)); color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-bottom: 8px; }
+  .ai-insight { display: flex; align-items: flex-start; gap: 10px; padding: 8px; background: var(--bg); border-radius: 6px; margin-bottom: 6px; }
+  .ai-insight-icon { font-size: 16px; flex-shrink: 0; }
+  .ai-insight-text { font-size: 11px; color: var(--text); line-height: 1.5; }
+  .ai-insight-text strong { color: var(--navy); }
+  .ai-multiplier { display: inline-block; background: var(--teal); color: white; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 3px; }
+
+  .pes-gauge { background: white; border-radius: 8px; padding: 14px 16px; border: 1px solid var(--border); margin-bottom: 12px; text-align: center; }
+  .pes-title { font-size: 11px; font-weight: 700; color: var(--navy); margin-bottom: 8px; text-align: left; }
+  .pes-number { font-size: 48px; font-weight: 900; color: var(--navy); line-height: 1; }
+  .pes-label { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .pes-bars { display: flex; gap: 6px; }
+  .pes-component { flex: 1; }
+  .pes-comp-label { font-size: 9px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+  .pes-comp-bar { height: 6px; border-radius: 3px; background: var(--bg); overflow: hidden; }
+  .pes-comp-fill { height: 100%; border-radius: 3px; }
+  .pes-comp-val { font-size: 11px; font-weight: 700; color: var(--navy); margin-top: 3px; }
+
+  .identity-flow { background: white; border-radius: 8px; padding: 14px 16px; border: 1px solid var(--border); margin-bottom: 12px; }
+  .identity-title { font-size: 11px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+  .id-step { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .id-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .id-line { width: 1px; height: 18px; margin-left: 4px; background: var(--border); }
+  .id-text { font-size: 10px; color: var(--text); }
+  .id-tag { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; }
+
+  .segment-builder { background: white; border-radius: 8px; padding: 14px 16px; border: 1px solid var(--border); margin-bottom: 12px; }
+  .seg-title { font-size: 11px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+  .seg-rule { display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: var(--bg); border-radius: 5px; margin-bottom: 4px; font-size: 10px; }
+  .seg-rule-op { background: var(--lavender); color: white; border-radius: 3px; padding: 1px 5px; font-size: 9px; font-weight: 700; }
+  .seg-count { background: var(--pink); color: white; border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 700; display: inline-block; margin-top: 8px; }
+
+  .data-sync { background: white; border-radius: 8px; padding: 14px 16px; border: 1px solid var(--border); margin-bottom: 12px; }
+  .ds-title { font-size: 11px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+  .ds-connector { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--bg); border-radius: 6px; margin-bottom: 6px; }
+  .ds-logo { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex-shrink: 0; }
+  .ds-info { flex: 1; }
+  .ds-name { font-size: 11px; font-weight: 700; color: var(--navy); }
+  .ds-status { font-size: 10px; color: var(--teal); }
+  .ds-badge { background: var(--teal); color: white; border-radius: 3px; padding: 2px 6px; font-size: 9px; font-weight: 700; }
+
+  /* ── SIDE PANEL ── */
+  .side-panel { display: flex; flex-direction: column; gap: 16px; }
+  .panel-card {
+    background: white; border-radius: 12px; border: 1px solid var(--border);
+    padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .panel-card h3 { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .panel-card h3 .icon { font-size: 16px; }
+  .talk-track { background: #FEF0F5; border-left: 3px solid var(--pink); border-radius: 0 6px 6px 0; padding: 12px 14px; font-size: 12px; color: var(--navy); line-height: 1.6; font-style: italic; }
+  .diff-pill { display: inline-flex; align-items: center; gap: 5px; background: var(--navy); color: white; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; margin: 3px 3px 3px 0; }
+  .discovery-q { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--text); line-height: 1.5; }
+  .discovery-q:last-child { border-bottom: none; }
+  .discovery-q .q-mark { color: var(--pink); font-weight: 800; margin-right: 4px; }
+  .step-nav { display: flex; gap: 8px; margin-top: 8px; }
+  .step-btn {
+    flex: 1; padding: 9px; border-radius: 7px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: 1.5px solid var(--border); background: white; color: var(--text); transition: all .2s;
+  }
+  .step-btn.primary { background: var(--pink); color: white; border-color: var(--pink); }
+  .step-btn:hover { opacity: 0.85; }
+
+  @media (max-width: 1024px) {
+    .main { grid-template-columns: 1fr; }
+    .flow-strip { padding: 16px 24px; }
+    .hero { padding: 24px; }
+    .main { padding: 20px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="logo">
+    <div class="logo-icon">P</div>
+    <div>
+      <div class="logo-text">Pendo Analytics</div>
+    </div>
+  </div>
+  <span class="subtitle">Demo Visual Flow · FY27 CEP</span>
+  <div class="persona-tabs">
+    <button class="persona-tab active" onclick="switchPersona(1)">👤 Persona 1 — Product Manager</button>
+    <button class="persona-tab" onclick="switchPersona(2)">📊 Persona 2 — Data Analyst</button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     PERSONA 1
+════════════════════════════════════════════════ -->
+<div class="page active" id="persona1">
+
+  <div class="hero">
+    <div class="hero-label">Persona 1</div>
+    <h1>Product Manager / Product Leader</h1>
+    <p>Frustrated by gut-feel decisions with no visibility into how users actually engage. Needs fast, behavioral insights without filing engineering tickets.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">🎯 <span>Pain: <strong>Data blindness, engineering bottleneck</strong></span></div>
+      <div class="hero-meta-item">📏 <span>Metrics: <strong>Feature adoption, funnel conversion, churn signal</strong></span></div>
+      <div class="hero-meta-item">⏱ <span>Demo: <strong>25–35 min</strong></span></div>
+    </div>
+  </div>
+
+  <div class="flow-strip">
+    <div class="flow-step" onclick="goStep(1,1)">
+      <div class="flow-node active" id="p1-node-1">
+        <div class="flow-num">1</div>
+        <div class="flow-label">Feature Adoption</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" onclick="goStep(1,2)">
+      <div class="flow-node" id="p1-node-2">
+        <div class="flow-num">2</div>
+        <div class="flow-label">Funnel Analysis</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" onclick="goStep(1,3)">
+      <div class="flow-node" id="p1-node-3">
+        <div class="flow-num">3</div>
+        <div class="flow-label">Path Analysis</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" onclick="goStep(1,4)">
+      <div class="flow-node" id="p1-node-4">
+        <div class="flow-num">4</div>
+        <div class="flow-label">AI Insights</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" onclick="goStep(1,5)">
+      <div class="flow-node" id="p1-node-5">
+        <div class="flow-num">5</div>
+        <div class="flow-label">Insight to Action</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- MOCKUP -->
+    <div id="p1-screen-1" class="p1-screen">
+      <div class="mockup-wrap">
+        <div class="mockup-chrome">
+          <div class="mockup-dots"><div class="mockup-dot red"></div><div class="mockup-dot yellow"></div><div class="mockup-dot green"></div></div>
+          <div class="mockup-url">app.pendo.io/analytics/pages-features</div>
+        </div>
+        <div class="mockup-app">
+          <div class="app-sidebar">
+            <div class="sidebar-section">Analytics</div>
+            <div class="sidebar-item active"><span class="sidebar-icon">📈</span> Pages & Features</div>
+            <div class="sidebar-item"><span class="sidebar-icon">⏱</span> Funnels</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🔀</span> Paths</div>
+            <div class="sidebar-item"><span class="sidebar-icon">💡</span> AI Insights</div>
+            <div class="sidebar-section" style="margin-top:12px">Engagement</div>
+            <div class="sidebar-item"><span class="sidebar-icon">📣</span> Guides</div>
+            <div class="sidebar-item"><span class="sidebar-icon">💬</span> Surveys</div>
+          </div>
+          <div class="app-main">
+            <div class="app-header">
+              <div>
+                <div class="app-title">Feature: Dashboard Builder</div>
+                <div class="app-subtitle">Last 30 days · All accounts · All visitors</div>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <div style="background:#F4F5F8;border-radius:5px;padding:4px 10px;font-size:10px;color:#8A8FA8;border:1px solid #E2E4EC;">📅 Last 30 days</div>
+                <div style="background:#F4F5F8;border-radius:5px;padding:4px 10px;font-size:10px;color:#8A8FA8;border:1px solid #E2E4EC;">⚙ Tag in VDS</div>
+              </div>
+            </div>
+            <div class="app-content">
+              <div class="metric-row">
+                <div class="metric-card">
+                  <div class="metric-label">Unique Visitors</div>
+                  <div class="metric-value">4,218</div>
+                  <div class="metric-delta up">▲ 12% vs prior period</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-label">Avg Time on Feature</div>
+                  <div class="metric-value">6m 42s</div>
+                  <div class="metric-delta up">▲ 8%</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-label">% of MAU Using</div>
+                  <div class="metric-value">61%</div>
+                  <div class="metric-delta up">▲ 3pts</div>
+                </div>
+              </div>
+              <div class="bar-chart">
+                <div class="bar-chart-title">Daily Unique Visitors — Dashboard Builder</div>
+                <div class="bars">
+                  <div class="bar pink" style="height:45%"></div>
+                  <div class="bar pink" style="height:52%"></div>
+                  <div class="bar pink" style="height:48%"></div>
+                  <div class="bar pink" style="height:62%"></div>
+                  <div class="bar pink" style="height:58%"></div>
+                  <div class="bar pink" style="height:71%"></div>
+                  <div class="bar pink" style="height:66%"></div>
+                  <div class="bar pink" style="height:74%"></div>
+                  <div class="bar pink" style="height:80%"></div>
+                  <div class="bar pink" style="height:78%"></div>
+                  <div class="bar pink" style="height:85%"></div>
+                  <div class="bar pink" style="height:90%"></div>
+                  <div class="bar pink" style="height:88%"></div>
+                  <div class="bar pink" style="height:95%"></div>
+                </div>
+                <div class="bar-labels">
+                  <div class="bar-label">Jul 7</div>
+                  <div class="bar-label"></div>
+                  <div class="bar-label"></div>
+                  <div class="bar-label">Jul 14</div>
+                  <div class="bar-label"></div>
+                  <div class="bar-label"></div>
+                  <div class="bar-label">Jul 21</div>
+                  <div class="bar-label"></div>
+                  <div class="bar-label"></div>
+                  <div class="bar-label">Jul 28</div>
+                  <div class="bar-label"></div>
+                  <div class="bar-label"></div>
+                  <div class="bar-label">Aug 4</div>
+                  <div class="bar-label">Aug 7</div>
+                </div>
+              </div>
+              <div style="background:white;border-radius:8px;padding:10px 14px;border:1px solid var(--border);font-size:10px;color:var(--muted);">
+                <strong style="color:var(--navy)">Tagged via Visual Design Studio</strong> — no developer required. Click any element in your app to tag it as a feature. Historical data loads retroactively from install date.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="p1-screen-2" class="p1-screen" style="display:none">
+      <div class="mockup-wrap">
+        <div class="mockup-chrome">
+          <div class="mockup-dots"><div class="mockup-dot red"></div><div class="mockup-dot yellow"></div><div class="mockup-dot green"></div></div>
+          <div class="mockup-url">app.pendo.io/analytics/funnels/onboarding</div>
+        </div>
+        <div class="mockup-app">
+          <div class="app-sidebar">
+            <div class="sidebar-section">Analytics</div>
+            <div class="sidebar-item"><span class="sidebar-icon">📈</span> Pages & Features</div>
+            <div class="sidebar-item active"><span class="sidebar-icon">⏱</span> Funnels</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🔀</span> Paths</div>
+            <div class="sidebar-item"><span class="sidebar-icon">💡</span> AI Insights</div>
+            <div class="sidebar-section" style="margin-top:12px">Engagement</div>
+            <div class="sidebar-item"><span class="sidebar-icon">📣</span> Guides</div>
+          </div>
+          <div class="app-main">
+            <div class="app-header">
+              <div>
+                <div class="app-title">Onboarding Funnel</div>
+                <div class="app-subtitle">Last 30 days · 1,847 visitors entered</div>
+              </div>
+              <div style="background:#FEF0F5;color:var(--pink);border-radius:5px;padding:4px 10px;font-size:10px;font-weight:700;">Overall: 62% conversion</div>
+            </div>
+            <div class="app-content">
+              <div class="funnel-chart">
+                <div class="funnel-title">Funnel Steps · Last 30 Days</div>
+                <div class="funnel-step">
+                  <div class="funnel-step-label">Sign Up Confirmed</div>
+                  <div class="funnel-bar-wrap"><div class="funnel-bar-fill" style="width:100%;background:var(--lavender)"><div class="funnel-bar-text">1,847 visitors</div></div></div>
+                  <div class="funnel-step-pct" style="color:var(--teal)">100%</div>
+                </div>
+                <div class="funnel-step">
+                  <div class="funnel-step-label">Profile Complete</div>
+                  <div class="funnel-bar-wrap"><div class="funnel-bar-fill" style="width:88%;background:#8B72CC"><div class="funnel-bar-text">1,625</div></div></div>
+                  <div class="funnel-step-pct" style="color:var(--teal)">88%</div>
+                </div>
+                <div class="funnel-step">
+                  <div class="funnel-step-label" style="font-weight:700;color:var(--pink)">⚠ Connect Integration</div>
+                  <div class="funnel-bar-wrap"><div class="funnel-bar-fill" style="width:53%;background:var(--pink)"><div class="funnel-bar-text">983 visitors</div></div></div>
+                  <div class="funnel-step-pct" style="color:var(--pink)">53% <span class="drop-badge">−35pts</span></div>
+                </div>
+                <div class="funnel-step">
+                  <div class="funnel-step-label">First Dashboard</div>
+                  <div class="funnel-bar-wrap"><div class="funnel-bar-fill" style="width:68%;background:#A994DC"><div class="funnel-bar-text">668</div></div></div>
+                  <div class="funnel-step-pct">68%</div>
+                </div>
+                <div class="funnel-step">
+                  <div class="funnel-step-label">Share or Invite</div>
+                  <div class="funnel-bar-wrap"><div class="funnel-bar-fill" style="width:93%;background:var(--teal)"><div class="funnel-bar-text">621 — 62% overall</div></div></div>
+                  <div class="funnel-step-pct" style="color:var(--teal)">93%</div>
+                </div>
+              </div>
+              <div style="background:#FEF0F5;border-radius:8px;padding:10px 14px;border:1px solid #FBBDD1;font-size:11px;">
+                <strong style="color:var(--pink)">856 visitors dropped at Step 3: Connect Integration.</strong><br>
+                <span style="color:var(--navy)">Click to segment drop-offs by account plan, role, or geography — no SQL required.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="p1-screen-3" class="p1-screen" style="display:none">
+      <div class="mockup-wrap">
+        <div class="mockup-chrome">
+          <div class="mockup-dots"><div class="mockup-dot red"></div><div class="mockup-dot yellow"></div><div class="mockup-dot green"></div></div>
+          <div class="mockup-url">app.pendo.io/analytics/paths</div>
+        </div>
+        <div class="mockup-app">
+          <div class="app-sidebar">
+            <div class="sidebar-section">Analytics</div>
+            <div class="sidebar-item"><span class="sidebar-icon">📈</span> Pages & Features</div>
+            <div class="sidebar-item"><span class="sidebar-icon">⏱</span> Funnels</div>
+            <div class="sidebar-item active"><span class="sidebar-icon">🔀</span> Paths</div>
+            <div class="sidebar-item"><span class="sidebar-icon">💡</span> AI Insights</div>
+            <div class="sidebar-section" style="margin-top:12px">Engagement</div>
+            <div class="sidebar-item"><span class="sidebar-icon">📣</span> Guides</div>
+          </div>
+          <div class="app-main">
+            <div class="app-header">
+              <div>
+                <div class="app-title">Path Analysis — Starting from Activation Page</div>
+                <div class="app-subtitle">Top 5 next actions after hitting "Activation Page" · Last 30 days</div>
+              </div>
+            </div>
+            <div class="app-content">
+              <div class="path-chart">
+                <div class="funnel-title">What users do AFTER the Activation Page</div>
+                <div class="path-row">
+                  <div class="path-node start">Activation Page</div>
+                  <div class="path-arrow">→</div>
+                  <div class="path-node" style="background:#E74C8B;">⚠ Settings</div>
+                  <div class="path-pct">31% of users</div>
+                  <div style="font-size:10px;background:#FEF0F5;color:var(--pink);padding:2px 6px;border-radius:3px;font-weight:700;">Unexpected</div>
+                </div>
+                <div class="path-row">
+                  <div class="path-node start">Activation Page</div>
+                  <div class="path-arrow">→</div>
+                  <div class="path-node end">Create Report ✓</div>
+                  <div class="path-pct">27% of users</div>
+                  <div style="font-size:10px;background:#E8F8F6;color:var(--teal);padding:2px 6px;border-radius:3px;font-weight:700;">Intended</div>
+                </div>
+                <div class="path-row">
+                  <div class="path-node start">Activation Page</div>
+                  <div class="path-arrow">→</div>
+                  <div class="path-node">Dashboard Builder</div>
+                  <div class="path-pct">18% of users</div>
+                </div>
+                <div class="path-row">
+                  <div class="path-node start">Activation Page</div>
+                  <div class="path-arrow">→</div>
+                  <div class="path-node">Invite Team</div>
+                  <div class="path-pct">14% of users</div>
+                </div>
+                <div class="path-row">
+                  <div class="path-node start">Activation Page</div>
+                  <div class="path-arrow">→</div>
+                  <div class="path-node" style="background:#CCC;">Exited App</div>
+                  <div class="path-pct">10% of users</div>
+                </div>
+              </div>
+              <div style="background:#FEF0F5;border-radius:8px;padding:10px 14px;border:1px solid #FBBDD1;font-size:11px;">
+                <strong style="color:var(--pink)">31% of activated users go to Settings, not Create Report.</strong>
+                <br><span style="color:var(--navy)">Jump directly to Guides to nudge these users back to the intended path — no engineering required.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="p1-screen-4" class="p1-screen" style="display:none">
+      <div class="mockup-wrap">
+        <div class="mockup-chrome">
+          <div class="mockup-dots"><div class="mockup-dot red"></div><div class="mockup-dot yellow"></div><div class="mockup-dot green"></div></div>
+          <div class="mockup-url">app.pendo.io/ai-insights/retention</div>
+        </div>
+        <div class="mockup-app">
+          <div class="app-sidebar">
+            <div class="sidebar-section">Analytics</div>
+            <div class="sidebar-item"><span class="sidebar-icon">📈</span> Pages & Features</div>
+            <div class="sidebar-item"><span class="sidebar-icon">⏱</span> Funnels</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🔀</span> Paths</div>
+            <div class="sidebar-item active"><span class="sidebar-icon">💡</span> AI Insights</div>
+            <div class="sidebar-section" style="margin-top:12px">Engagement</div>
+            <div class="sidebar-item"><span class="sidebar-icon">📣</span> Guides</div>
+          </div>
+          <div class="app-main">
+            <div class="app-header">
+              <div>
+                <div class="app-title">AI Insights — Retention Driver Analysis</div>
+                <div class="app-subtitle">Based on 90-day retention data · All segments</div>
+              </div>
+              <div style="background:linear-gradient(90deg,var(--lavender),var(--pink));color:white;border-radius:20px;padding:4px 12px;font-size:10px;font-weight:700;">✨ Powered by Pendo ML</div>
+            </div>
+            <div class="app-content">
+              <div class="ai-card">
+                <div class="ai-badge">✨ AI Insights</div>
+                <div class="ai-insight">
+                  <div class="ai-insight-icon">🔑</div>
+                  <div class="ai-insight-text">
+                    <strong>Top Retention Driver: "Create Report" in first 7 days</strong><br>
+                    Users who use Create Report within 7 days of sign-up are <span class="ai-multiplier">3.2× more likely</span> to be active at 90 days. This behavior affects <strong>1,247 users</strong> this quarter.
+                  </div>
+                </div>
+                <div class="ai-insight">
+                  <div class="ai-insight-icon">📊</div>
+                  <div class="ai-insight-text">
+                    <strong>#2 Driver: "Dashboard Shared" in first 14 days</strong><br>
+                    Sharing a dashboard signals team collaboration. These users retain at <span class="ai-multiplier">2.7× the baseline</span> rate.
+                  </div>
+                </div>
+                <div class="ai-insight">
+                  <div class="ai-insight-icon">⚠️</div>
+                  <div class="ai-insight-text">
+                    <strong>Churn Risk Signal: 0 logins in last 14 days</strong><br>
+                    <strong style="color:var(--pink)">342 accounts</strong> match this pattern today. High-ARR accounts are flagged for immediate follow-up.
+                  </div>
+                </div>
+              </div>
+              <div style="background:white;border-radius:8px;padding:10px 14px;border:1px solid var(--border);font-size:10px;color:var(--muted);">
+                Analysis based on 24,000+ user journeys · Updated daily · Click any insight to drill into the supporting data or create a targeted guide.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="p1-screen-5" class="p1-screen" style="display:none">
+      <div class="mockup-wrap">
+        <div class="mockup-chrome">
+          <div class="mockup-dots"><div class="mockup-dot red"></div><div class="mockup-dot yellow"></div><div class="mockup-dot green"></div></div>
+          <div class="mockup-url">app.pendo.io/guides/new — Triggered from AI Insights</div>
+        </div>
+        <div class="mockup-app">
+          <div class="app-sidebar">
+            <div class="sidebar-section">Analytics</div>
+            <div class="sidebar-item"><span class="sidebar-icon">📈</span> Pages & Features</div>
+            <div class="sidebar-item"><span class="sidebar-icon">💡</span> AI Insights</div>
+            <div class="sidebar-section" style="margin-top:12px">Engagement</div>
+            <div class="sidebar-item active"><span class="sidebar-icon">📣</span> Guides</div>
+            <div class="sidebar-item"><span class="sidebar-icon">💬</span> Surveys</div>
+          </div>
+          <div class="app-main">
+            <div class="app-header">
+              <div>
+                <div class="app-title">New Guide — Retention Nudge (AI Insights → Action)</div>
+                <div class="app-subtitle">Tooltip · Triggered from AI Insights: Create Report driver</div>
+              </div>
+              <div style="background:var(--teal);color:white;border-radius:5px;padding:4px 10px;font-size:10px;font-weight:700;">Draft · Unsaved</div>
+            </div>
+            <div class="app-content">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                <div style="background:white;border-radius:8px;padding:12px;border:1px solid var(--border);">
+                  <div style="font-size:10px;font-weight:700;color:var(--navy);margin-bottom:6px;">Guide Type</div>
+                  <div style="background:#FEF0F5;border:2px solid var(--pink);border-radius:6px;padding:8px;font-size:11px;font-weight:600;color:var(--pink);text-align:center;">📍 Tooltip</div>
+                </div>
+                <div style="background:white;border-radius:8px;padding:12px;border:1px solid var(--border);">
+                  <div style="font-size:10px;font-weight:700;color:var(--navy);margin-bottom:6px;">Targeting Segment</div>
+                  <div style="background:var(--bg);border-radius:5px;padding:6px 8px;font-size:10px;color:var(--text);">New Users — Retention Risk<br><span style="color:var(--muted)">Days active ≤7, no Create Report event</span></div>
+                </div>
+              </div>
+              <div style="background:white;border-radius:8px;padding:12px;border:1px solid var(--border);margin-bottom:10px;">
+                <div style="font-size:10px;font-weight:700;color:var(--navy);margin-bottom:6px;">Guide Content Preview</div>
+                <div style="background:white;border:2px solid var(--pink);border-radius:8px;padding:10px 12px;max-width:260px;box-shadow:0 4px 14px rgba(232,22,91,0.15);">
+                  <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:4px;">💡 Pro tip: Create your first Report</div>
+                  <div style="font-size:10px;color:#555;line-height:1.5;">Teams who create a Report in week one see 3× better outcomes. It only takes 2 minutes.</div>
+                  <div style="margin-top:8px;display:flex;gap:6px;">
+                    <div style="background:var(--pink);color:white;border-radius:4px;padding:4px 10px;font-size:10px;font-weight:700;cursor:pointer;">Show me how</div>
+                    <div style="color:var(--muted);font-size:10px;padding:4px;">Dismiss</div>
+                  </div>
+                </div>
+              </div>
+              <div style="background:#E8F8F6;border-radius:8px;padding:10px 14px;border:1px solid #B2EAE4;font-size:11px;color:var(--navy);">
+                <strong>⏱ Time from AI Insight to live guide:</strong> &lt; 60 minutes. No engineering ticket. No release cycle. Impact measured automatically when you save.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDE PANEL P1 -->
+    <div class="side-panel">
+      <div class="panel-card" id="p1-talk-panel">
+        <h3><span class="icon">🎙</span> Talk Track</h3>
+        <div class="talk-track" id="p1-talk"></div>
+      </div>
+      <div class="panel-card" id="p1-diff-panel">
+        <h3><span class="icon">⚡</span> Differentiator to Land</h3>
+        <div id="p1-diff"></div>
+      </div>
+      <div class="panel-card">
+        <h3><span class="icon">🔍</span> Discovery Question</h3>
+        <div class="discovery-q" id="p1-dq"></div>
+      </div>
+      <div class="panel-card" style="padding:14px 20px;">
+        <div class="step-nav">
+          <button class="step-btn" id="p1-prev-btn" onclick="prevStep(1)">← Prev</button>
+          <button class="step-btn primary" id="p1-next-btn" onclick="nextStep(1)">Next →</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PERSONA 2
+════════════════════════════════════════════════ -->
+<div class="page" id="persona2">
+
+  <div class="hero" style="background: linear-gradient(135deg, #1A2E4A 0%, #0E3D5C 100%);">
+    <div class="hero-label" style="background: var(--teal)">Persona 2</div>
+    <h1>Data Analyst / Growth Team</h1>
+    <p>Needs a complete, stitchable user journey — from anonymous visit to retained customer — and wants data that integrates with the existing warehouse and BI stack.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">🎯 <span>Pain: <strong>Fragmented data, incomplete journey view</strong></span></div>
+      <div class="hero-meta-item">📏 <span>Metrics: <strong>Retention rate, trial conversion, funnel drop-off</strong></span></div>
+      <div class="hero-meta-item">⏱ <span>Demo: <strong>30–40 min</strong></span></div>
+    </div>
+  </div>
+
+  <div class="flow-strip">
+    <div class="flow-step" onclick="goStep(2,1)">
+      <div class="flow-node active" id="p2-node-1">
+        <div class="flow-num">1</div>
+        <div class="flow-label">Product Engagement Score</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" onclick="goStep(2,2)">
+      <div class="flow-node" id="p2-node-2">
+        <div class="flow-num">2</div>
+        <div class="flow-label">Retention Cohorts</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" onclick="goStep(2,3)">
+      <div class="flow-node" id="p2-node-3">
+        <div class="flow-num">3</div>
+        <div class="flow-label">Identity Mapping</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" onclick="goStep(2,4)">
+      <div class="flow-node" id="p2-node-4">
+        <div class="flow-num">4</div>
+        <div class="flow-label">Segments</div>
+      </div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" onclick="goStep(2,5)">
+      <div class="flow-node" id="p2-node-5">
+        <div class="flow-num">5</div>
+        <div class="flow-label">Data Sync</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- P2 SCREENS -->
+    <div id="p2-screen-1" class="p2-screen">
+      <div class="mockup-wrap">
+        <div class="mockup-chrome">
+          <div class="mockup-dots"><div class="mockup-dot red"></div><div class="mockup-dot yellow"></div><div class="mockup-dot green"></div></div>
+          <div class="mockup-url">app.pendo.io/analytics/product-engagement-score</div>
+        </div>
+        <div class="mockup-app">
+          <div class="app-sidebar">
+            <div class="sidebar-section">Analytics</div>
+            <div class="sidebar-item active"><span class="sidebar-icon">🏆</span> Product Eng. Score</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🔁</span> Retention</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🗂</span> Segments</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🔗</span> Identity Mapping</div>
+            <div class="sidebar-section" style="margin-top:12px">Integrations</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🔄</span> Data Sync</div>
+          </div>
+          <div class="app-main">
+            <div class="app-header">
+              <div>
+                <div class="app-title">Product Engagement Score (PES)</div>
+                <div class="app-subtitle">All accounts · Rolling 90 days</div>
+              </div>
+            </div>
+            <div class="app-content">
+              <div class="metric-row">
+                <div class="pes-gauge">
+                  <div class="pes-title">Overall PES</div>
+                  <div class="pes-number" style="color:var(--lavender)">67</div>
+                  <div class="pes-label">out of 100 · ▲ 4pts vs last quarter</div>
+                  <div class="pes-bars">
+                    <div class="pes-component">
+                      <div class="pes-comp-label">Adoption</div>
+                      <div class="pes-comp-bar"><div class="pes-comp-fill" style="width:72%;background:var(--pink)"></div></div>
+                      <div class="pes-comp-val">72</div>
+                    </div>
+                    <div class="pes-component">
+                      <div class="pes-comp-label">Stickiness</div>
+                      <div class="pes-comp-bar"><div class="pes-comp-fill" style="width:61%;background:var(--lavender)"></div></div>
+                      <div class="pes-comp-val">61</div>
+                    </div>
+                    <div class="pes-component">
+                      <div class="pes-comp-label">Growth</div>
+                      <div class="pes-comp-bar"><div class="pes-comp-fill" style="width:68%;background:var(--teal)"></div></div>
+                      <div class="pes-comp-val">68</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="bar-chart">
+                <div class="bar-chart-title">PES by Account Segment</div>
+                <div class="bars">
+                  <div class="bar teal" style="height:82%;"></div>
+                  <div class="bar" style="height:67%;background:var(--lavender)"></div>
+                  <div class="bar" style="height:45%;background:#CCC"></div>
+                </div>
+                <div class="bar-labels">
+                  <div class="bar-label" style="font-size:10px;font-weight:700;color:var(--teal)">Enterprise (82)</div>
+                  <div class="bar-label" style="font-size:10px;font-weight:700;color:var(--lavender)">Growth (67)</div>
+                  <div class="bar-label" style="font-size:10px;font-weight:700;color:#999">Free (45)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="p2-screen-2" class="p2-screen" style="display:none">
+      <div class="mockup-wrap">
+        <div class="mockup-chrome">
+          <div class="mockup-dots"><div class="mockup-dot red"></div><div class="mockup-dot yellow"></div><div class="mockup-dot green"></div></div>
+          <div class="mockup-url">app.pendo.io/analytics/retention</div>
+        </div>
+        <div class="mockup-app">
+          <div class="app-sidebar">
+            <div class="sidebar-section">Analytics</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🏆</span> Product Eng. Score</div>
+            <div class="sidebar-item active"><span class="sidebar-icon">🔁</span> Retention</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🗂</span> Segments</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🔗</span> Identity Mapping</div>
+            <div class="sidebar-section" style="margin-top:12px">Integrations</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🔄</span> Data Sync</div>
+          </div>
+          <div class="app-main">
+            <div class="app-header">
+              <div>
+                <div class="app-title">Retention Cohort Analysis</div>
+                <div class="app-subtitle">Monthly cohorts · % of users active at each interval</div>
+              </div>
+            </div>
+            <div class="app-content">
+              <div class="cohort-grid">
+                <div class="cohort-title">Visitor Retention by Sign-Up Cohort</div>
+                <table class="cohort-table">
+                  <tr>
+                    <th>Cohort</th><th>Month 0</th><th>Month 1</th><th>Month 2</th><th>Month 3</th><th>Month 4</th><th>Month 5</th>
+                  </tr>
+                  <tr>
+                    <td><strong>Feb 26</strong></td>
+                    <td class="cell-100">100%</td><td class="cell-80">80%</td><td class="cell-80">75%</td><td class="cell-65" style="outline:2px solid var(--teal)">68%</td><td class="cell-65">64%</td><td class="cell-65">62%</td>
+                  </tr>
+                  <tr>
+                    <td>Mar 26</td>
+                    <td class="cell-100">100%</td><td class="cell-80">74%</td><td class="cell-65">65%</td><td class="cell-50">57%</td><td class="cell-50">52%</td><td class="cell-40">48%</td>
+                  </tr>
+                  <tr>
+                    <td>Apr 26</td>
+                    <td class="cell-100">100%</td><td class="cell-65">69%</td><td class="cell-50">58%</td><td class="cell-50">51%</td><td class="cell-40">46%</td><td></td>
+                  </tr>
+                  <tr>
+                    <td>May 26</td>
+                    <td class="cell-100">100%</td><td class="cell-65">66%</td><td class="cell-50">54%</td><td class="cell-40">47%</td><td></td><td></td>
+                  </tr>
+                  <tr>
+                    <td>Jun 26</td>
+                    <td class="cell-100">100%</td><td class="cell-50">58%</td><td class="cell-40">44%</td><td></td><td></td><td></td>
+                  </tr>
+                  <tr>
+                    <td><strong style="color:var(--pink)">Aug 26 ⚠</strong></td>
+                    <td class="cell-100">100%</td><td class="cell-38" style="outline:2px solid var(--pink)">41%</td><td></td><td></td><td></td><td></td>
+                  </tr>
+                </table>
+              </div>
+              <div style="display:flex;gap:8px;font-size:10px;">
+                <div style="background:#E8F8F6;border-radius:5px;padding:6px 10px;border:1px solid var(--teal);color:var(--navy);">🟢 <strong>Feb cohort: 68% at 90 days</strong> — your best. Click to see behavioral profile.</div>
+                <div style="background:#FEF0F5;border-radius:5px;padding:6px 10px;border:1px solid var(--pink);color:var(--navy);">🔴 <strong>Aug cohort: 41% at 30 days</strong> — underperforming. What did they do differently?</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="p2-screen-3" class="p2-screen" style="display:none">
+      <div class="mockup-wrap">
+        <div class="mockup-chrome">
+          <div class="mockup-dots"><div class="mockup-dot red"></div><div class="mockup-dot yellow"></div><div class="mockup-dot green"></div></div>
+          <div class="mockup-url">app.pendo.io/analytics/identity-mapping</div>
+        </div>
+        <div class="mockup-app">
+          <div class="app-sidebar">
+            <div class="sidebar-section">Analytics</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🏆</span> Product Eng. Score</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🔁</span> Retention</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🗂</span> Segments</div>
+            <div class="sidebar-item active"><span class="sidebar-icon">🔗</span> Identity Mapping</div>
+            <div class="sidebar-section" style="margin-top:12px">Integrations</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🔄</span> Data Sync</div>
+          </div>
+          <div class="app-main">
+            <div class="app-header">
+              <div>
+                <div class="app-title">Identity Mapping — Anonymous → Identified Journey</div>
+                <div class="app-subtitle">Visitor: anon_a8f72c → user_49281 (Jennifer K.)</div>
+              </div>
+            </div>
+            <div class="app-content">
+              <div class="identity-flow">
+                <div class="identity-title">Complete Journey: First Visit → Active User</div>
+                <div class="id-step">
+                  <div class="id-dot" style="background:#CCC"></div>
+                  <div class="id-text"><strong>Anonymous visit:</strong> Pricing Page (3 views over 4 days) <span class="id-tag" style="background:#F4F5F8;color:var(--muted)">anon_a8f72c</span></div>
+                </div>
+                <div style="height:14px;border-left:1px dashed #CCC;margin-left:4px;"></div>
+                <div class="id-step">
+                  <div class="id-dot" style="background:#CCC"></div>
+                  <div class="id-text"><strong>Anonymous visit:</strong> Use Case: Advanced Analytics (2 views) <span class="id-tag" style="background:#F4F5F8;color:var(--muted)">anon_a8f72c</span></div>
+                </div>
+                <div style="height:14px;border-left:1px dashed #CCC;margin-left:4px;"></div>
+                <div class="id-step">
+                  <div class="id-dot" style="background:var(--pink)"></div>
+                  <div class="id-text"><strong>Sign-up event fired</strong> — identity stitched <span class="id-tag" style="background:#FEF0F5;color:var(--pink)">ID STITCHED</span></div>
+                </div>
+                <div style="height:14px;border-left:1px solid var(--lavender);margin-left:4px;"></div>
+                <div class="id-step">
+                  <div class="id-dot" style="background:var(--lavender)"></div>
+                  <div class="id-text"><strong>In-app:</strong> Jennifer K. → Advanced Analytics page (Day 1) <span class="id-tag" style="background:#EDE8F9;color:var(--lavender)">user_49281</span></div>
+                </div>
+                <div style="height:14px;border-left:1px solid var(--lavender);margin-left:4px;"></div>
+                <div class="id-step">
+                  <div class="id-dot" style="background:var(--teal)"></div>
+                  <div class="id-text"><strong>In-app:</strong> Create Report (Day 3) — retained at 90 days <span class="id-tag" style="background:#E8F8F6;color:var(--teal)">RETAINED ✓</span></div>
+                </div>
+              </div>
+              <div style="background:#E8F8F6;border-radius:8px;padding:10px 14px;border:1px solid var(--teal);font-size:11px;color:var(--navy);">
+                <strong>Insight:</strong> Visitors who viewed the Advanced Analytics use case page before sign-up convert and retain at 2.1× the rate of other visitors — informing content and acquisition strategy.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="p2-screen-4" class="p2-screen" style="display:none">
+      <div class="mockup-wrap">
+        <div class="mockup-chrome">
+          <div class="mockup-dots"><div class="mockup-dot red"></div><div class="mockup-dot yellow"></div><div class="mockup-dot green"></div></div>
+          <div class="mockup-url">app.pendo.io/segments/new</div>
+        </div>
+        <div class="mockup-app">
+          <div class="app-sidebar">
+            <div class="sidebar-section">Analytics</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🏆</span> Product Eng. Score</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🔁</span> Retention</div>
+            <div class="sidebar-item active"><span class="sidebar-icon">🗂</span> Segments</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🔗</span> Identity Mapping</div>
+            <div class="sidebar-section" style="margin-top:12px">Integrations</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🔄</span> Data Sync</div>
+          </div>
+          <div class="app-main">
+            <div class="app-header">
+              <div>
+                <div class="app-title">Segment Builder — Enterprise API Expansion Target</div>
+                <div class="app-subtitle">Built live in demo · Real-time visitor count</div>
+              </div>
+            </div>
+            <div class="app-content">
+              <div class="segment-builder">
+                <div class="seg-title">Segment Rules (ALL must match)</div>
+                <div class="seg-rule">
+                  <span class="seg-rule-op">ACCOUNT</span>
+                  <span>account.plan</span>
+                  <span style="color:var(--muted)">equals</span>
+                  <strong>Enterprise</strong>
+                </div>
+                <div class="seg-rule">
+                  <span class="seg-rule-op">BEHAVIOR</span>
+                  <span>Reporting feature used</span>
+                  <span style="color:var(--muted)">≥</span>
+                  <strong>2 times</strong>
+                  <span style="color:var(--muted)">in last 30 days</span>
+                </div>
+                <div class="seg-rule">
+                  <span class="seg-rule-op">BEHAVIOR</span>
+                  <span>API Integration page viewed</span>
+                  <span style="color:var(--muted)">=</span>
+                  <strong>0 times</strong>
+                  <span style="color:var(--muted)">ever</span>
+                </div>
+                <div class="seg-count">342 visitors match · Updated in real-time</div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:4px;">
+                <div style="background:white;border-radius:6px;padding:8px;border:1px solid var(--border);font-size:10px;text-align:center;">
+                  <div style="color:var(--muted)">Use in</div>
+                  <div style="font-weight:700;color:var(--navy)">Analytics</div>
+                </div>
+                <div style="background:white;border-radius:6px;padding:8px;border:1px solid var(--border);font-size:10px;text-align:center;">
+                  <div style="color:var(--muted)">Target via</div>
+                  <div style="font-weight:700;color:var(--pink)">In-App Guide</div>
+                </div>
+                <div style="background:white;border-radius:6px;padding:8px;border:1px solid var(--border);font-size:10px;text-align:center;">
+                  <div style="color:var(--muted)">Push to</div>
+                  <div style="font-weight:700;color:var(--teal)">Salesforce List</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="p2-screen-5" class="p2-screen" style="display:none">
+      <div class="mockup-wrap">
+        <div class="mockup-chrome">
+          <div class="mockup-dots"><div class="mockup-dot red"></div><div class="mockup-dot yellow"></div><div class="mockup-dot green"></div></div>
+          <div class="mockup-url">app.pendo.io/integrations/data-sync</div>
+        </div>
+        <div class="mockup-app">
+          <div class="app-sidebar">
+            <div class="sidebar-section">Analytics</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🏆</span> Product Eng. Score</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🔁</span> Retention</div>
+            <div class="sidebar-item"><span class="sidebar-icon">🗂</span> Segments</div>
+            <div class="sidebar-section" style="margin-top:12px">Integrations</div>
+            <div class="sidebar-item active"><span class="sidebar-icon">🔄</span> Data Sync</div>
+          </div>
+          <div class="app-main">
+            <div class="app-header">
+              <div>
+                <div class="app-title">Data Sync — Warehouse Integrations</div>
+                <div class="app-subtitle">Export raw Pendo events to your data warehouse</div>
+              </div>
+            </div>
+            <div class="app-content">
+              <div class="data-sync">
+                <div class="ds-title">Active Connectors</div>
+                <div class="ds-connector">
+                  <div class="ds-logo" style="background:#29B5E8;color:white;">❄</div>
+                  <div class="ds-info">
+                    <div class="ds-name">Snowflake</div>
+                    <div class="ds-status">Syncing · Last run: 2h ago · 1.2M events exported</div>
+                  </div>
+                  <div class="ds-badge">Active</div>
+                </div>
+                <div class="ds-connector">
+                  <div class="ds-logo" style="background:#4285F4;color:white;">G</div>
+                  <div class="ds-info">
+                    <div class="ds-name">BigQuery</div>
+                    <div class="ds-status">Available — click to configure</div>
+                  </div>
+                  <div class="ds-badge" style="background:var(--muted)">Configure</div>
+                </div>
+                <div class="ds-connector">
+                  <div class="ds-logo" style="background:#DC4337;color:white;">R</div>
+                  <div class="ds-info">
+                    <div class="ds-name">Amazon Redshift</div>
+                    <div class="ds-status">Available — click to configure</div>
+                  </div>
+                  <div class="ds-badge" style="background:var(--muted)">Configure</div>
+                </div>
+              </div>
+              <div style="background:white;border-radius:8px;padding:10px 14px;border:1px solid var(--border);font-size:10px;color:var(--navy);">
+                <div style="font-weight:700;margin-bottom:4px;">Exported tables include:</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                  <span style="background:var(--bg);border-radius:3px;padding:2px 7px;font-family:monospace;">visitor_events</span>
+                  <span style="background:var(--bg);border-radius:3px;padding:2px 7px;font-family:monospace;">page_views</span>
+                  <span style="background:var(--bg);border-radius:3px;padding:2px 7px;font-family:monospace;">feature_clicks</span>
+                  <span style="background:var(--bg);border-radius:3px;padding:2px 7px;font-family:monospace;">guide_interactions</span>
+                  <span style="background:var(--bg);border-radius:3px;padding:2px 7px;font-family:monospace;">account_metadata</span>
+                  <span style="background:var(--bg);border-radius:3px;padding:2px 7px;font-family:monospace;">poll_responses</span>
+                </div>
+                <div style="margin-top:8px;color:var(--muted);">Join with Salesforce, billing, and support data in your existing dbt models. Schema docs available in Help Center.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDE PANEL P2 -->
+    <div class="side-panel">
+      <div class="panel-card">
+        <h3><span class="icon">🎙</span> Talk Track</h3>
+        <div class="talk-track" id="p2-talk"></div>
+      </div>
+      <div class="panel-card">
+        <h3><span class="icon">⚡</span> Differentiator to Land</h3>
+        <div id="p2-diff"></div>
+      </div>
+      <div class="panel-card">
+        <h3><span class="icon">🔍</span> Discovery Question</h3>
+        <div class="discovery-q" id="p2-dq"></div>
+      </div>
+      <div class="panel-card" style="padding:14px 20px;">
+        <div class="step-nav">
+          <button class="step-btn" id="p2-prev-btn" onclick="prevStep(2)">← Prev</button>
+          <button class="step-btn primary" id="p2-next-btn" onclick="nextStep(2)">Next →</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const state = { p1: 1, p2: 1 };
+
+const p1Data = {
+  1: {
+    talk: '"This is where most of our PM customers live day-to-day. You\'re looking at real usage of your Dashboard Builder — unique visitors, time on feature, and trend over the last 30 days. No engineering ticket was required. A PM tagged this feature in 90 seconds using our Visual Design Studio. What would it mean to have this visibility across every feature in your product, on demand?"',
+    diff: ['Low-code visual tagging — PM self-service', 'Retroactive data from day of install'],
+    dq: '"When a stakeholder asks \'is Feature X being used?\', what\'s that process today — and how long does it take?"'
+  },
+  2: {
+    talk: '"Here\'s your onboarding funnel. 62% of users who start onboarding complete it — 38% fall out. The biggest drop-off is Step 3, Connect Integration: 856 visitors dropped there. I can segment those drop-offs right here by account plan, role, or geography. No SQL, no data analyst ticket — I find the \'who\' in one click."',
+    diff: ['Funnel analysis with in-context segmentation', 'Identify drop-off cohorts without leaving the screen'],
+    dq: '"What\'s your most important onboarding or activation metric right now?"'
+  },
+  3: {
+    talk: '"Path analysis answers a question most tools can\'t: after a user hits your activation page, what do they actually do next? 31% go to Settings — not your intended \'Create Report\' path. That insight might reshape how you sequence the product experience. And you can act on it right now — jump into Guides from this view and deploy a contextual tooltip nudging users back to the intended path. Live in your product today."',
+    diff: ['Closed loop: insight → in-app action, no context switching', 'Surface unintended navigation patterns instantly'],
+    dq: '"Have you ever been surprised by how users actually navigate your product vs how you intended?"'
+  },
+  4: {
+    talk: '"Pendo Insights has analyzed all your behavioral data and found: users who hit Create Report in their first 7 days are 3.2× more likely to be retained at 90 days. That\'s based on your actual data. Without AI Insights, finding this would take your data team a week of work and a lot of assumptions. Pendo surfaces it automatically — and you can go build a guide that nudges new users toward that action immediately."',
+    diff: ['Proprietary ML identifies retention drivers automatically', 'Hours of manual analysis eliminated'],
+    dq: '"If you could know one thing about why users churn, what would it be?"'
+  },
+  5: {
+    talk: '"Pendo told us the retention driver. Now watch how fast we act on it. I\'m building a tooltip targeting new users who haven\'t hit Create Report by day three. No engineering, no release cycle. This is what turns Pendo Analytics from a reporting tool into a growth engine — you\'re not just seeing what\'s happening, you\'re changing what happens next and measuring the impact, all in one platform."',
+    diff: ['Only platform that closes the loop: analytics → in-app action → measurement', 'No context switching, no engineering tickets'],
+    dq: '"If you could go from insight to in-app action in hours instead of weeks, what would you do differently?"'
+  }
+};
+
+const p2Data = {
+  1: {
+    talk: '"Pendo\'s Product Engagement Score rolls three dimensions into a single trackable number: Adoption — are users discovering features? Stickiness — are they coming back? Growth — are active users increasing? You can benchmark this against anonymized Pendo customer data. For a Data Analyst, PES is useful because it gives you a defensible executive metric while still letting you drill into each component when you need the \'why\'."',
+    diff: ['Composite product health metric grounded in behavior', 'Not a vanity metric — three distinct signal dimensions'],
+    dq: '"What\'s your current go-to metric for product health? Is it a single number or a dashboard?"'
+  },
+  2: {
+    talk: '"Retention cohorts show you, by sign-up period, how well you\'re retaining users over time. Your February cohort retains at 68% at 90 days — your best. August is at 41% at 30 days. The question is: what did February users do differently? You can filter either cohort by behavior — which features they used, which events they fired — and compare profiles directly. This analysis would typically take an analyst days of SQL work. In Pendo, five minutes."',
+    diff: ['Built-in cohort retention analysis with behavioral drill-down', 'No warehouse query, no data science ticket'],
+    dq: '"Do you run retention cohort analysis today? What tool, and how often?"'
+  },
+  3: {
+    talk: '"Most analytics platforms lose the thread when a user logs in for the first time. Pendo\'s Identity Mapping stitches together the anonymous visitor session with the identified user post-login. Jennifer visited your pricing page three times, read your Advanced Analytics use case, then signed up — and in-app, she went straight to that feature and retained. That\'s a complete acquisition-to-retention picture most teams can only approximate by joining data from three different systems. Here it\'s native."',
+    diff: ['End-to-end journey from anonymous visit to retained customer', 'No multi-system stitching required'],
+    dq: '"Do you have visibility into user behavior before they log in — on your marketing site?"'
+  },
+  4: {
+    talk: '"Pendo segments are behavioral — combine usage criteria, account metadata, and guide interactions. I\'ll build one live: Enterprise plan accounts who used Reporting at least twice in 30 days but have never touched the API Integration page. That\'s your API add-on expansion target — 342 accounts. This segment is now a first-class object: filter any analytics view, trigger an in-app campaign, or push it to Salesforce as a dynamic list. One definition, many uses."',
+    diff: ['Behavioral + metadata segmentation powering analytics, guidance, and CRM', 'One segment definition — multiple downstream uses'],
+    dq: '"If you could segment users by what they\'ve done in the product — not just who they are — how would you use that?"'
+  },
+  5: {
+    talk: '"For your data team, Pendo isn\'t a closed box. Data Sync exports raw behavioral events — every tagged page visit, feature click, guide interaction — to Snowflake, BigQuery, or Redshift on a scheduled cadence. The schema is clean and documented. That means your dbt models can join Pendo\'s behavioral data with Salesforce opportunity data, billing data, support volume — whatever gives you the complete picture. Pendo becomes your behavioral data layer for the whole data stack."',
+    diff: ['Raw event export to Snowflake / BigQuery / Redshift', 'Pendo as behavioral data layer for your full analytics stack'],
+    dq: '"Do you have a data warehouse where you centralize product and business data? What does that stack look like?"'
+  }
+};
+
+function renderPanel(persona, step) {
+  const data = persona === 1 ? p1Data[step] : p2Data[step];
+  const prefix = `p${persona}`;
+
+  document.getElementById(`${prefix}-talk`).textContent = data.talk;
+
+  const diffEl = document.getElementById(`${prefix}-diff`);
+  diffEl.innerHTML = data.diff.map(d => `<span class="diff-pill">✓ ${d}</span>`).join('');
+
+  const dqEl = document.getElementById(`${prefix}-dq`);
+  dqEl.innerHTML = `<span class="q-mark">?</span>${data.dq}`;
+
+  // prev/next
+  const prevBtn = document.getElementById(`${prefix}-prev-btn`);
+  const nextBtn = document.getElementById(`${prefix}-next-btn`);
+  prevBtn.disabled = step === 1;
+  prevBtn.style.opacity = step === 1 ? '0.4' : '1';
+  nextBtn.textContent = step === 5 ? '✓ Done' : 'Next →';
+  nextBtn.disabled = step === 5;
+  nextBtn.style.opacity = step === 5 ? '0.4' : '1';
+}
+
+function goStep(persona, step) {
+  state[`p${persona}`] = step;
+  const prefix = `p${persona}`;
+
+  // hide all screens
+  document.querySelectorAll(`.${prefix}-screen`).forEach(s => s.style.display = 'none');
+  document.getElementById(`${prefix}-screen-${step}`).style.display = 'block';
+
+  // update flow nodes
+  for (let i = 1; i <= 5; i++) {
+    const node = document.getElementById(`${prefix}-node-${i}`);
+    node.className = 'flow-node' + (i === step ? ' active' : i < step ? ' done' : '');
+  }
+
+  renderPanel(persona, step);
+}
+
+function nextStep(persona) {
+  const cur = state[`p${persona}`];
+  if (cur < 5) goStep(persona, cur + 1);
+}
+
+function prevStep(persona) {
+  const cur = state[`p${persona}`];
+  if (cur > 1) goStep(persona, cur - 1);
+}
+
+function switchPersona(n) {
+  document.querySelectorAll('.page').forEach((p,i) => p.classList.toggle('active', i === n-1));
+  document.querySelectorAll('.persona-tab').forEach((t,i) => t.classList.toggle('active', i === n-1));
+}
+
+// Init
+goStep(1, 1);
+goStep(2, 1);
+</script>
+</body>
+</html>

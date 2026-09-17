@@ -305,35 +305,35 @@
   </div>
 
   <div class="flow-strip">
-    <div class="flow-step" onclick="goStep(1,1)">
+    <div class="flow-step" onclick="goStep(1,1,'flow_strip')">
       <div class="flow-node active" id="p1-node-1">
         <div class="flow-num">1</div>
         <div class="flow-label">Feature Adoption</div>
       </div>
     </div>
     <div class="flow-arrow">→</div>
-    <div class="flow-step" onclick="goStep(1,2)">
+    <div class="flow-step" onclick="goStep(1,2,'flow_strip')">
       <div class="flow-node" id="p1-node-2">
         <div class="flow-num">2</div>
         <div class="flow-label">Funnel Analysis</div>
       </div>
     </div>
     <div class="flow-arrow">→</div>
-    <div class="flow-step" onclick="goStep(1,3)">
+    <div class="flow-step" onclick="goStep(1,3,'flow_strip')">
       <div class="flow-node" id="p1-node-3">
         <div class="flow-num">3</div>
         <div class="flow-label">Path Analysis</div>
       </div>
     </div>
     <div class="flow-arrow">→</div>
-    <div class="flow-step" onclick="goStep(1,4)">
+    <div class="flow-step" onclick="goStep(1,4,'flow_strip')">
       <div class="flow-node" id="p1-node-4">
         <div class="flow-num">4</div>
         <div class="flow-label">AI Insights</div>
       </div>
     </div>
     <div class="flow-arrow">→</div>
-    <div class="flow-step" onclick="goStep(1,5)">
+    <div class="flow-step" onclick="goStep(1,5,'flow_strip')">
       <div class="flow-node" id="p1-node-5">
         <div class="flow-num">5</div>
         <div class="flow-label">Insight to Action</div>
@@ -720,35 +720,35 @@
   </div>
 
   <div class="flow-strip">
-    <div class="flow-step" onclick="goStep(2,1)">
+    <div class="flow-step" onclick="goStep(2,1,'flow_strip')">
       <div class="flow-node active" id="p2-node-1">
         <div class="flow-num">1</div>
         <div class="flow-label">Product Engagement Score</div>
       </div>
     </div>
     <div class="flow-arrow">→</div>
-    <div class="flow-step" onclick="goStep(2,2)">
+    <div class="flow-step" onclick="goStep(2,2,'flow_strip')">
       <div class="flow-node" id="p2-node-2">
         <div class="flow-num">2</div>
         <div class="flow-label">Retention Cohorts</div>
       </div>
     </div>
     <div class="flow-arrow">→</div>
-    <div class="flow-step" onclick="goStep(2,3)">
+    <div class="flow-step" onclick="goStep(2,3,'flow_strip')">
       <div class="flow-node" id="p2-node-3">
         <div class="flow-num">3</div>
         <div class="flow-label">Identity Mapping</div>
       </div>
     </div>
     <div class="flow-arrow">→</div>
-    <div class="flow-step" onclick="goStep(2,4)">
+    <div class="flow-step" onclick="goStep(2,4,'flow_strip')">
       <div class="flow-node" id="p2-node-4">
         <div class="flow-num">4</div>
         <div class="flow-label">Segments</div>
       </div>
     </div>
     <div class="flow-arrow">→</div>
-    <div class="flow-step" onclick="goStep(2,5)">
+    <div class="flow-step" onclick="goStep(2,5,'flow_strip')">
       <div class="flow-node" id="p2-node-5">
         <div class="flow-num">5</div>
         <div class="flow-label">Data Sync</div>
@@ -1122,6 +1122,14 @@ pendo.initialize({
 
 const state = { p1: 1, p2: 1 };
 
+// Pendo Track Event helpers
+const personaNames = { 1: 'Product Manager', 2: 'Data Analyst' };
+const stepNames = {
+  1: { 1: 'Feature Adoption', 2: 'Funnel Analysis', 3: 'Path Analysis', 4: 'AI Insights', 5: 'Insight to Action' },
+  2: { 1: 'Product Engagement Score', 2: 'Retention Cohorts', 3: 'Identity Mapping', 4: 'Segments', 5: 'Data Sync' }
+};
+const completedFlows = new Set(); // dedup guard for Demo Flow Completed
+
 const p1Data = {
   1: {
     talk: '"This is where most of our PM customers live day-to-day. You\'re looking at real usage of your Dashboard Builder — unique visitors, time on feature, and trend over the last 30 days. No engineering ticket was required. A PM tagged this feature in 90 seconds using our Visual Design Studio. What would it mean to have this visibility across every feature in your product, on demand?"',
@@ -1200,7 +1208,7 @@ function renderPanel(persona, step) {
   nextBtn.style.opacity = step === 5 ? '0.4' : '1';
 }
 
-function goStep(persona, step) {
+function goStep(persona, step, source) {
   state[`p${persona}`] = step;
   const prefix = `p${persona}`;
 
@@ -1215,21 +1223,50 @@ function goStep(persona, step) {
   }
 
   renderPanel(persona, step);
+
+  // Track step navigation (skip initial page load)
+  if (source && typeof pendo !== 'undefined') {
+    pendo.track("Demo Step Viewed", {
+      persona_name: personaNames[persona],
+      persona_number: persona,
+      step_number: step,
+      step_name: stepNames[persona][step],
+      navigation_method: source,
+      total_steps: 5
+    });
+
+    // Track flow completion (once per persona per session)
+    if (step === 5 && !completedFlows.has(persona)) {
+      completedFlows.add(persona);
+      pendo.track("Demo Flow Completed", {
+        persona_name: personaNames[persona],
+        persona_number: persona
+      });
+    }
+  }
 }
 
 function nextStep(persona) {
   const cur = state[`p${persona}`];
-  if (cur < 5) goStep(persona, cur + 1);
+  if (cur < 5) goStep(persona, cur + 1, 'next_button');
 }
 
 function prevStep(persona) {
   const cur = state[`p${persona}`];
-  if (cur > 1) goStep(persona, cur - 1);
+  if (cur > 1) goStep(persona, cur - 1, 'prev_button');
 }
 
 function switchPersona(n) {
   document.querySelectorAll('.page').forEach((p,i) => p.classList.toggle('active', i === n-1));
   document.querySelectorAll('.persona-tab').forEach((t,i) => t.classList.toggle('active', i === n-1));
+
+  // Track persona switch
+  if (typeof pendo !== 'undefined') {
+    pendo.track("Persona Switched", {
+      persona_name: personaNames[n],
+      persona_number: n
+    });
+  }
 }
 
 // Init
